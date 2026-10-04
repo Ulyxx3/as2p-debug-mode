@@ -53,7 +53,7 @@ Le menu s'ouvre et se ferme instantanément en jeu en appuyant sur **F1**, **F3*
 ### 🪟 Windows
 1. Téléchargez ou clonez ce dépôt dans un dossier de votre choix :
    ```bash
-   git clone https://github.com/Ulysse/as2p-debug-mode.git
+   git clone https://github.com/Ulyxx3/as2p-debug-mode.git
    ```
 2. Double-cliquez simplement sur **`patch.bat`** (ou lancez `python patch.py`).
 3. L'installeur détecte automatiquement votre dossier Steam, crée une sauvegarde automatique (`AVS03Pro.pck.bak`) et patche le jeu.
@@ -62,7 +62,7 @@ Le menu s'ouvre et se ferme instantanément en jeu en appuyant sur **F1**, **F3*
 ### 🐧 Linux & Steam Deck (SteamOS)
 1. Ouvrez un terminal dans le dossier du dépôt :
    ```bash
-   git clone https://github.com/Ulysse/as2p-debug-mode.git
+   git clone https://github.com/Ulyxx3/as2p-debug-mode.git
    cd as2p-debug-mode
    ```
 2. Rendez le script exécutable et lancez-le :
