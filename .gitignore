@@ -1,0 +1,24 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.tmp
+*.tmp.pck
+
+# Backups
+*.bak
+*.pck.bak
+
+# Large tool binaries (gdre_tools)
+tools/gdre_tools*
+tools/GDRE*
+tools/*.zip
+tools/*.dll
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Scratch & test
+scratch/
