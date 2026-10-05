@@ -11,27 +11,28 @@ enum TabType {
 var current_tab: TabType = TabType.STATS
 var is_closing: bool = false
 var items_subtab: String = "weapons" # "weapons", "drivers", "plugins"
+var current_lang: String = "en"
 
 # Les 18 statistiques du joueur
 const STAT_DEFINITIONS: Array[Dictionary] = [
-	{"id": "upgrade_player_max_health", "name": "PV Maxi (Max HP)", "step": 1.0, "is_mult": false},
-	{"id": "upgrade_player_health_regen", "name": "Regen PV (Health Regen)", "step": 0.05, "is_mult": false},
-	{"id": "upgrade_player_damage_multi", "name": "Force Attaque (Damage Multi)", "step": 0.25, "is_mult": true},
-	{"id": "upgrade_player_power_multi", "name": "Puissance (Power Multi)", "step": 0.25, "is_mult": true},
-	{"id": "upgrade_player_refresh_multi", "name": "Cadence Tir (Attack Cooldown)", "step": 0.1, "is_mult": true},
-	{"id": "upgrade_player_weap_speed", "name": "Vitesse Armes (Weapon Speed)", "step": 0.2, "is_mult": true},
-	{"id": "upgrade_player_weap_size", "name": "Taille Armes (Weapon Size)", "step": 0.2, "is_mult": true},
-	{"id": "upgrade_player_weap_amount", "name": "Nombre Tirs (Weapon Amount)", "step": 1.0, "is_mult": false},
-	{"id": "upgrade_player_speed", "name": "Vitesse Depl. (Move Speed)", "step": 0.2, "is_mult": true},
-	{"id": "upgrade_player_armor", "name": "Protection (Armor)", "step": 1.0, "is_mult": false},
-	{"id": "upgrade_player_dodge", "name": "Perte Paquets (Dodge)", "step": 0.1, "is_mult": false},
-	{"id": "upgrade_player_crit_chance", "name": "Chance Critique (Crit Chance)", "step": 0.05, "is_mult": true},
-	{"id": "upgrade_player_crit_damage_multi", "name": "Degats Crit. (Crit Damage)", "step": 0.5, "is_mult": true},
-	{"id": "upgrade_player_luck", "name": "Chance (Luck)", "step": 0.25, "is_mult": true},
-	{"id": "upgrade_player_magnetism_multi", "name": "Magnetisme (Pickup Radius)", "step": 0.25, "is_mult": true},
-	{"id": "upgrade_player_proc_speed", "name": "Vitesse CPU (Proc Speed)", "step": 0.2, "is_mult": true},
-	{"id": "upgrade_player_exp_gain", "name": "Gain EXP (Exp Multi)", "step": 0.25, "is_mult": true},
-	{"id": "upgrade_player_coin_gain", "name": "Gain Pieces (Coin Multi)", "step": 0.25, "is_mult": true}
+	{"id": "upgrade_player_max_health", "en": "Max HP", "fr": "PV Maxi", "step": 1.0, "is_mult": false},
+	{"id": "upgrade_player_health_regen", "en": "Health Regen", "fr": "Regen PV", "step": 0.05, "is_mult": false},
+	{"id": "upgrade_player_damage_multi", "en": "Damage Multi", "fr": "Force Attaque", "step": 0.25, "is_mult": true},
+	{"id": "upgrade_player_power_multi", "en": "Power Multi", "fr": "Puissance", "step": 0.25, "is_mult": true},
+	{"id": "upgrade_player_refresh_multi", "en": "Attack Cooldown", "fr": "Cadence Tir", "step": 0.1, "is_mult": true},
+	{"id": "upgrade_player_weap_speed", "en": "Weapon Speed", "fr": "Vitesse Armes", "step": 0.2, "is_mult": true},
+	{"id": "upgrade_player_weap_size", "en": "Weapon Size", "fr": "Taille Armes", "step": 0.2, "is_mult": true},
+	{"id": "upgrade_player_weap_amount", "en": "Weapon Amount", "fr": "Nombre Tirs", "step": 1.0, "is_mult": false},
+	{"id": "upgrade_player_speed", "en": "Move Speed", "fr": "Vitesse Depl.", "step": 0.2, "is_mult": true},
+	{"id": "upgrade_player_armor", "en": "Armor", "fr": "Protection", "step": 1.0, "is_mult": false},
+	{"id": "upgrade_player_dodge", "en": "Dodge", "fr": "Perte Paquets", "step": 0.1, "is_mult": false},
+	{"id": "upgrade_player_crit_chance", "en": "Crit Chance", "fr": "Chance Critique", "step": 0.05, "is_mult": true},
+	{"id": "upgrade_player_crit_damage_multi", "en": "Crit Damage", "fr": "Degats Crit.", "step": 0.5, "is_mult": true},
+	{"id": "upgrade_player_luck", "en": "Luck", "fr": "Chance", "step": 0.25, "is_mult": true},
+	{"id": "upgrade_player_magnetism_multi", "en": "Pickup Radius", "fr": "Magnetisme", "step": 0.25, "is_mult": true},
+	{"id": "upgrade_player_proc_speed", "en": "Proc Speed", "fr": "Vitesse CPU", "step": 0.2, "is_mult": true},
+	{"id": "upgrade_player_exp_gain", "en": "Exp Multi", "fr": "Gain EXP", "step": 0.25, "is_mult": true},
+	{"id": "upgrade_player_coin_gain", "en": "Coin Multi", "fr": "Gain Pieces", "step": 0.25, "is_mult": true}
 ]
 
 # Les 24 armes officielles du jeu
@@ -81,9 +82,21 @@ var status_label: Label = null
 var tab_bar: HBoxContainer = null
 var menu_cursor: Cursor = null
 
+func init_language() -> void:
+	var loc: String = TranslationServer.get_locale().to_lower()
+	if loc.begins_with("fr"):
+		current_lang = "fr"
+	else:
+		current_lang = "en"
+
+func t(en_txt: String, fr_txt: String) -> String:
+	return fr_txt if current_lang == "fr" else en_txt
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("debug_menu_instance")
+	
+	init_language()
 	
 	# 1. Éliminer immédiatement tout ancien curseur parasite
 	for c in get_children():
@@ -118,11 +131,11 @@ func _ready() -> void:
 	if basic_window != null:
 		basic_window.mouse_filter = Control.MOUSE_FILTER_STOP
 		basic_window.set_anchors_preset(Control.PRESET_CENTER)
-		basic_window.custom_minimum_size = Vector2(460, 270)
-		basic_window.custom_maximum_size = Vector2(460, 270)
-		basic_window.offset_left = -230.0
-		basic_window.offset_right = 230.0
-		basic_window.offset_top = -125.0
+		basic_window.custom_minimum_size = Vector2(470, 275)
+		basic_window.custom_maximum_size = Vector2(470, 275)
+		basic_window.offset_left = -235.0
+		basic_window.offset_right = 235.0
+		basic_window.offset_top = -130.0
 		basic_window.offset_bottom = 145.0
 		
 		# Masquer barre d'outils Windows standard
@@ -173,7 +186,7 @@ func _ready() -> void:
 		# A. Barre d'onglets
 		tab_bar = HBoxContainer.new()
 		tab_bar.name = "TabBar"
-		tab_bar.add_theme_constant_override("separation", 4)
+		tab_bar.add_theme_constant_override("separation", 3)
 		root_col.add_child(tab_bar)
 		setup_tab_bar_buttons()
 		
@@ -181,7 +194,7 @@ func _ready() -> void:
 		status_label = Label.new()
 		status_label.name = "StatusLabel"
 		status_label.theme_type_variation = &"FuzzyType"
-		status_label.text = "Ready"
+		status_label.text = t("Ready", "Pret")
 		root_col.add_child(status_label)
 		
 		# C. ScrollContainer
@@ -294,22 +307,37 @@ func setup_tab_bar_buttons() -> void:
 	if tab_bar == null:
 		return
 	
-	create_tab_button("📊 Stats", TabType.STATS, 75)
-	create_tab_button("⚔️ Items", TabType.ITEMS, 75)
-	create_tab_button("📈 Progr.", TabType.PROGRESS, 75)
-	create_tab_button("⚡ Triche", TabType.CHEATS, 75)
+	for child in tab_bar.get_children():
+		child.queue_free()
+	
+	create_tab_button("📊 " + t("Stats", "Stats"), TabType.STATS, 65)
+	create_tab_button("⚔️ " + t("Items", "Items"), TabType.ITEMS, 65)
+	create_tab_button("📈 " + t("Progr.", "Progr."), TabType.PROGRESS, 65)
+	create_tab_button("⚡ " + t("Cheats", "Triche"), TabType.CHEATS, 65)
 	
 	var spacer = Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tab_bar.add_child(spacer)
 	
+	# Bouton de bascule de langue instantanée
+	var btn_lang = Button.new()
+	btn_lang.text = "🌐 " + ("FR" if current_lang == "en" else "EN")
+	btn_lang.tooltip_text = t("Switch to French", "Passer en anglais")
+	btn_lang.custom_minimum_size = Vector2(46, 20)
+	btn_lang.pressed.connect(func():
+		current_lang = "fr" if current_lang == "en" else "en"
+		setup_tab_bar_buttons()
+		render_current_tab()
+	)
+	tab_bar.add_child(btn_lang)
+	
 	var btn_close = Button.new()
-	btn_close.text = "✖ Fermer"
-	btn_close.custom_minimum_size = Vector2(65, 20)
+	btn_close.text = "✖ " + t("Close", "Fermer")
+	btn_close.custom_minimum_size = Vector2(60, 20)
 	btn_close.pressed.connect(close)
 	tab_bar.add_child(btn_close)
 
-func create_tab_button(text: String, tab_id: TabType, min_w: int = 75) -> void:
+func create_tab_button(text: String, tab_id: TabType, min_w: int = 65) -> void:
 	var btn = Button.new()
 	btn.text = text
 	btn.custom_minimum_size = Vector2(min_w, 20)
@@ -335,14 +363,14 @@ func render_current_tab() -> void:
 # ONGLET 1 : STATISTIQUES (18 STATS + POINTS DE VIE)
 # ==============================================================================
 func render_stats_tab() -> void:
-	add_header_row("=== 📊 STATISTIQUES DU JOUEUR (TEMPS REEL) ===")
+	add_header_row(t("=== 📊 PLAYER STATS (REAL TIME) ===", "=== 📊 STATISTIQUES DU JOUEUR (TEMPS REEL) ==="))
 	
 	var player = get_player()
-	var hp_info = "Joueur non detecte (Hors partie)"
+	var hp_info = t("Player not detected (Not in run)", "Joueur non detecte (Hors partie)")
 	if player != null and player.health_component != null:
 		var cur_hp = player.health_component.current_health
 		var max_hp = player.health_component.max_health
-		hp_info = "Points de Vie : %d / %d HP" % [roundi(cur_hp), roundi(max_hp)]
+		hp_info = t("Health : %d / %d HP", "Points de Vie : %d / %d HP") % [roundi(cur_hp), roundi(max_hp)]
 	
 	var hp_row = HBoxContainer.new()
 	var hp_label = Label.new()
@@ -351,7 +379,7 @@ func render_stats_tab() -> void:
 	hp_row.add_child(hp_label)
 	
 	var btn_heal = Button.new()
-	btn_heal.text = "Soin Complet"
+	btn_heal.text = t("Full Heal", "Soin Complet")
 	btn_heal.pressed.connect(func():
 		heal_player_full()
 		render_current_tab()
@@ -359,7 +387,7 @@ func render_stats_tab() -> void:
 	hp_row.add_child(btn_heal)
 	
 	var btn_hp50 = Button.new()
-	btn_hp50.text = "+50 PV"
+	btn_hp50.text = "+50 HP"
 	btn_hp50.pressed.connect(func():
 		modify_player_current_hp(50.0)
 		render_current_tab()
@@ -367,7 +395,7 @@ func render_stats_tab() -> void:
 	hp_row.add_child(btn_hp50)
 	
 	var btn_hurt = Button.new()
-	btn_hurt.text = "-20 PV"
+	btn_hurt.text = "-20 HP"
 	btn_hurt.pressed.connect(func():
 		modify_player_current_hp(-20.0)
 		render_current_tab()
@@ -378,11 +406,11 @@ func render_stats_tab() -> void:
 	# Boutons d'ajustement global
 	var fast_row = HBoxContainer.new()
 	var btn_buff_all = Button.new()
-	btn_buff_all.text = "⚡ +20% TOUTES STATS"
+	btn_buff_all.text = t("⚡ +20% ALL STATS", "⚡ +20% TOUTES STATS")
 	btn_buff_all.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_buff_all.pressed.connect(func():
 		buff_all_stats(0.2)
-		set_status("+20% applique a toutes les statistiques !")
+		set_status(t("+20% applied to all player stats!", "+20% applique a toutes les statistiques !"))
 		render_current_tab()
 	)
 	fast_row.add_child(btn_buff_all)
@@ -392,16 +420,16 @@ func render_stats_tab() -> void:
 	btn_godly.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_godly.pressed.connect(func():
 		buff_all_stats(9.0)
-		set_status("Statistiques divines x10 appliquees !")
+		set_status(t("Godly stats x10 applied!", "Statistiques divines x10 appliquees !"))
 		render_current_tab()
 	)
 	fast_row.add_child(btn_godly)
 	
 	var btn_reset_all = Button.new()
-	btn_reset_all.text = "🔄 Reset Stats"
+	btn_reset_all.text = t("🔄 Reset Stats", "🔄 Reset Stats")
 	btn_reset_all.pressed.connect(func():
 		reset_all_stats()
-		set_status("Stats de base restaurees.")
+		set_status(t("Default stats restored.", "Stats de base restaurees."))
 		render_current_tab()
 	)
 	fast_row.add_child(btn_reset_all)
@@ -412,7 +440,7 @@ func render_stats_tab() -> void:
 	# Les 18 statistiques du joueur
 	for item in STAT_DEFINITIONS:
 		var stat_id: String = item["id"]
-		var stat_name: String = item["name"]
+		var stat_name: String = item["fr"] if current_lang == "fr" else item["en"]
 		var step: float = item["step"]
 		var is_mult: bool = item["is_mult"]
 		
@@ -484,11 +512,11 @@ func render_stats_tab() -> void:
 # ONGLET 2 : ITEMS & EQUIPEMENT (ARMES, DRIVERS, PLUGINS)
 # ==============================================================================
 func render_items_tab() -> void:
-	add_header_row("=== ⚔️ INVENTAIRE & EQUIPEMENT ===")
+	add_header_row(t("=== ⚔️ INVENTORY & EQUIPMENT ===", "=== ⚔️ INVENTAIRE & EQUIPEMENT ==="))
 	
 	var subtab_row = HBoxContainer.new()
 	var btn_w = Button.new()
-	btn_w.text = " Armes (24) "
+	btn_w.text = t(" Weapons (24) ", " Armes (24) ")
 	btn_w.pressed.connect(func():
 		items_subtab = "weapons"
 		render_current_tab()
@@ -496,7 +524,7 @@ func render_items_tab() -> void:
 	subtab_row.add_child(btn_w)
 	
 	var btn_d = Button.new()
-	btn_d.text = " Pilotes (Drivers) "
+	btn_d.text = t(" Drivers ", " Pilotes (Drivers) ")
 	btn_d.pressed.connect(func():
 		items_subtab = "drivers"
 		render_current_tab()
@@ -516,7 +544,7 @@ func render_items_tab() -> void:
 	
 	var um = get_upgrade_manager()
 	if um == null:
-		add_label("Veuillez lancer une partie pour équiper et tester des armes en direct.")
+		add_label(t("Please start a run to equip and test weapons in real time.", "Veuillez lancer une partie pour équiper et tester des armes en direct."))
 		return
 	
 	match items_subtab:
@@ -528,7 +556,7 @@ func render_items_tab() -> void:
 			render_plugins_subtab(um)
 
 func render_weapons_subtab(um: Node) -> void:
-	add_label("Armes disponibles (Cliquer pour équiper ou monter de niveau) :")
+	add_label(t("Available weapons (Click to equip or level up):", "Armes disponibles (Cliquer pour équiper ou monter de niveau) :"))
 	var grid = GridContainer.new()
 	grid.columns = 2
 	
@@ -537,7 +565,7 @@ func render_weapons_subtab(um: Node) -> void:
 		for w in ALL_WEAPONS:
 			var btn = Button.new()
 			btn.text = "+ %s" % w["name"]
-			btn.custom_minimum_size = Vector2(210, 20)
+			btn.custom_minimum_size = Vector2(215, 20)
 			btn.pressed.connect(func():
 				equip_weapon_by_id(w["id"])
 				render_current_tab()
@@ -550,24 +578,24 @@ func render_weapons_subtab(um: Node) -> void:
 			var label_txt: String = ("⭐ %s [Lv+1]" % w_name) if is_equipped else ("+ %s" % w_name)
 			var btn = Button.new()
 			btn.text = label_txt
-			btn.custom_minimum_size = Vector2(210, 20)
+			btn.custom_minimum_size = Vector2(215, 20)
 			btn.pressed.connect(func():
 				if is_equipped:
 					um.apply_silent_weapon_levels(w, 1)
-					set_status("Niveau de %s augmente !" % w_name)
+					set_status(t("Level of %s increased!", "Niveau de %s augmente !") % w_name)
 				else:
 					um.apply_weapon(w)
-					set_status("Arme %s equipee !" % w_name)
+					set_status(t("Weapon %s equipped!", "Arme %s equipee !") % w_name)
 				render_current_tab()
 			)
 			grid.add_child(btn)
 	content.add_child(grid)
 
 func render_drivers_subtab(um: Node) -> void:
-	add_label("Pilotes (Drivers) disponibles :")
+	add_label(t("Available drivers:", "Pilotes (Drivers) disponibles :"))
 	var drivers_list: Array = um.all_drivers if (um != null and um.get("all_drivers") != null) else []
 	if drivers_list.is_empty():
-		add_label("Aucun pilote detecte dans la partie active.")
+		add_label(t("No drivers detected in active run.", "Aucun pilote detecte dans la partie active."))
 		return
 	
 	var grid = GridContainer.new()
@@ -576,21 +604,21 @@ func render_drivers_subtab(um: Node) -> void:
 		var d_name: String = str(d.name) if d.get("name") != null else str(d.id)
 		var btn = Button.new()
 		btn.text = "+ %s" % d_name
-		btn.custom_minimum_size = Vector2(210, 20)
+		btn.custom_minimum_size = Vector2(215, 20)
 		btn.pressed.connect(func():
 			if d.get("weapon_id") != null:
 				um.apply_driver(d, d.weapon_id)
-				set_status("Driver %s applique !" % d_name)
+				set_status(t("Driver %s applied!", "Driver %s applique !") % d_name)
 			render_current_tab()
 		)
 		grid.add_child(btn)
 	content.add_child(grid)
 
 func render_plugins_subtab(um: Node) -> void:
-	add_label("Plugins disponibles :")
+	add_label(t("Available plugins:", "Plugins disponibles :"))
 	var plugins_list: Array = um.all_plugins if (um != null and um.get("all_plugins") != null) else []
 	if plugins_list.is_empty():
-		add_label("Aucun plugin detecte dans la partie active.")
+		add_label(t("No plugins detected in active run.", "Aucun plugin detecte dans la partie active."))
 		return
 	
 	var grid = GridContainer.new()
@@ -599,10 +627,10 @@ func render_plugins_subtab(um: Node) -> void:
 		var p_name: String = str(p.name) if p.get("name") != null else str(p.id)
 		var btn = Button.new()
 		btn.text = "+ %s" % p_name
-		btn.custom_minimum_size = Vector2(210, 20)
+		btn.custom_minimum_size = Vector2(215, 20)
 		btn.pressed.connect(func():
 			um.apply_plugin(p)
-			set_status("Plugin %s applique !" % p_name)
+			set_status(t("Plugin %s applied!", "Plugin %s applique !") % p_name)
 			render_current_tab()
 		)
 		grid.add_child(btn)
@@ -612,26 +640,26 @@ func render_plugins_subtab(um: Node) -> void:
 # ONGLET 3 : PROGRESSION & META
 # ==============================================================================
 func render_progress_tab() -> void:
-	add_header_row("=== 📈 PROGRESSION DU RUN & META ===")
+	add_header_row(t("=== 📈 RUN PROGRESSION & META ===", "=== 📈 PROGRESSION DU RUN & META ==="))
 	
 	# Section EXP & Niveaux
 	var exp_mgr = get_experience_manager()
 	var cur_level: int = exp_mgr.current_level if exp_mgr != null else 1
 	var cur_exp: float = exp_mgr.current_experience if exp_mgr != null else 0.0
 	var tar_exp: float = exp_mgr.target_experience if exp_mgr != null else 100.0
-	add_label("Niveau actuel : %d  |  EXP : %d / %d" % [cur_level, roundi(cur_exp), roundi(tar_exp)])
+	add_label(t("Current Level: %d  |  EXP: %d / %d", "Niveau actuel : %d  |  EXP : %d / %d") % [cur_level, roundi(cur_exp), roundi(tar_exp)])
 	
 	var lvl_row = HBoxContainer.new()
-	add_quick_btn(lvl_row, "+1 Niveau", func(): level_up_run(1))
-	add_quick_btn(lvl_row, "+5 Niveaux", func(): level_up_run(5))
-	add_quick_btn(lvl_row, "+10 Niveaux", func(): level_up_run(10))
-	add_quick_btn(lvl_row, "+25 Niveaux", func(): level_up_run(25))
+	add_quick_btn(lvl_row, t("+1 Level", "+1 Niveau"), func(): level_up_run(1))
+	add_quick_btn(lvl_row, t("+5 Levels", "+5 Niveaux"), func(): level_up_run(5))
+	add_quick_btn(lvl_row, t("+10 Levels", "+10 Niveaux"), func(): level_up_run(10))
+	add_quick_btn(lvl_row, t("+25 Levels", "+25 Niveaux"), func(): level_up_run(25))
 	content.add_child(lvl_row)
 	
 	var exp_row = HBoxContainer.new()
-	add_quick_btn(exp_row, "+100 EXP", func(): give_run_exp(100.0))
-	add_quick_btn(exp_row, "+1 000 EXP", func(): give_run_exp(1000.0))
-	add_quick_btn(exp_row, "+5 000 EXP", func(): give_run_exp(5000.0))
+	add_quick_btn(exp_row, t("+100 EXP", "+100 EXP"), func(): give_run_exp(100.0))
+	add_quick_btn(exp_row, t("+1,000 EXP", "+1 000 EXP"), func(): give_run_exp(1000.0))
+	add_quick_btn(exp_row, t("+5,000 EXP", "+5 000 EXP"), func(): give_run_exp(5000.0))
 	content.add_child(exp_row)
 	
 	add_separator()
@@ -640,35 +668,35 @@ func render_progress_tab() -> void:
 	var cm = get_currency_manager()
 	var cur_coins: float = cm.currencies.get("Coin", 0.0) if cm != null else 0.0
 	var cur_keys: float = cm.currencies.get("Keys", 0.0) if cm != null else 0.0
-	add_label("Ressources du Run : %.2f Pieces  |  %d Cles" % [cur_coins, roundi(cur_keys)])
+	add_label(t("Run Resources: %.2f Coins  |  %d Keys", "Ressources du Run : %.2f Pieces  |  %d Cles") % [cur_coins, roundi(cur_keys)])
 	
 	var coin_row = HBoxContainer.new()
-	add_quick_btn(coin_row, "+100 Pieces", func(): give_run_coins(100.0))
-	add_quick_btn(coin_row, "+1 000 Pieces", func(): give_run_coins(1000.0))
-	add_quick_btn(coin_row, "+10 000 Pieces", func(): give_run_coins(10000.0))
+	add_quick_btn(coin_row, t("+100 Coins", "+100 Pieces"), func(): give_run_coins(100.0))
+	add_quick_btn(coin_row, t("+1,000 Coins", "+1 000 Pieces"), func(): give_run_coins(1000.0))
+	add_quick_btn(coin_row, t("+10,000 Coins", "+10 000 Pieces"), func(): give_run_coins(10000.0))
 	content.add_child(coin_row)
 	
 	var key_row = HBoxContainer.new()
-	add_quick_btn(key_row, "+1 Cle", func(): give_run_keys(1.0))
-	add_quick_btn(key_row, "+5 Cles", func(): give_run_keys(5.0))
-	add_quick_btn(key_row, "+10 Cles", func(): give_run_keys(10.0))
+	add_quick_btn(key_row, t("+1 Key", "+1 Cle"), func(): give_run_keys(1.0))
+	add_quick_btn(key_row, t("+5 Keys", "+5 Cles"), func(): give_run_keys(5.0))
+	add_quick_btn(key_row, t("+10 Keys", "+10 Cles"), func(): give_run_keys(10.0))
 	content.add_child(key_row)
 	
 	add_separator()
 	
 	# Section Meta-Progression (Beanz & Unlocks)
 	var beanz_count: int = MetaProgression.get_currency() if MetaProgression != null else 0
-	add_label("Beanz Profil (Monnaie Permanente) : %d" % beanz_count)
+	add_label(t("Profile Beanz (Permanent Currency): %d", "Beanz Profil (Monnaie Permanente) : %d") % beanz_count)
 	
 	var beanz_row = HBoxContainer.new()
-	add_quick_btn(beanz_row, "+500 Beanz", func(): give_beanz(500))
-	add_quick_btn(beanz_row, "+5 000 Beanz", func(): give_beanz(5000))
-	add_quick_btn(beanz_row, "+50 000 Beanz", func(): give_beanz(50000))
+	add_quick_btn(beanz_row, t("+500 Beanz", "+500 Beanz"), func(): give_beanz(500))
+	add_quick_btn(beanz_row, t("+5,000 Beanz", "+5 000 Beanz"), func(): give_beanz(5000))
+	add_quick_btn(beanz_row, t("+50,000 Beanz", "+50 000 Beanz"), func(): give_beanz(50000))
 	content.add_child(beanz_row)
 	
 	var unlock_row = HBoxContainer.new()
 	var btn_unlock = Button.new()
-	btn_unlock.text = "🔓 Debloquer Tout le Contenu (Armes, Objets, Thèmes)"
+	btn_unlock.text = t("🔓 Unlock All Content (Weapons, Items, Themes)", "🔓 Debloquer Tout le Contenu (Armes, Objets, Thèmes)")
 	btn_unlock.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_unlock.pressed.connect(func():
 		unlock_all_content()
@@ -680,11 +708,14 @@ func render_progress_tab() -> void:
 # ONGLET 4 : TRICHE & TESTS
 # ==============================================================================
 func render_cheats_tab() -> void:
-	add_header_row("=== ⚡ TRICHE & TESTS IN-GAME ===")
+	add_header_row(t("=== ⚡ CHEATS & IN-GAME TESTING ===", "=== ⚡ TRICHE & TESTS IN-GAME ==="))
 	
 	# God Mode
 	var is_god: bool = (GameEvents != null and GameEvents.get("debug_god_mode") == true)
-	var god_txt: String = "🛡️ INVULNERABILITE (GOD MODE) : ACTIVE [ON]" if is_god else "🛡️ INVULNERABILITE (GOD MODE) : DESACTIVE [OFF]"
+	var god_txt: String = t(
+		"🛡️ GOD MODE (INVULNERABILITY): ENABLED [ON]" if is_god else "🛡️ GOD MODE (INVULNERABILITY): DISABLED [OFF]",
+		"🛡️ INVULNERABILITE (GOD MODE) : ACTIVE [ON]" if is_god else "🛡️ INVULNERABILITE (GOD MODE) : DESACTIVE [OFF]"
+	)
 	var btn_god = Button.new()
 	btn_god.text = god_txt
 	btn_god.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -696,11 +727,11 @@ func render_cheats_tab() -> void:
 	
 	# Kill all enemies
 	var btn_nuke = Button.new()
-	btn_nuke.text = "💣 NETTOYER TOUS LES ENNEMIS (KILL ALL)"
+	btn_nuke.text = t("💣 KILL ALL ENEMIES (NUKE)", "💣 NETTOYER TOUS LES ENNEMIS (KILL ALL)")
 	btn_nuke.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_nuke.pressed.connect(func():
 		kill_all_enemies()
-		set_status("Tous les ennemis ont ete elimines !")
+		set_status(t("All enemies have been eliminated!", "Tous les ennemis ont ete elimines !"))
 	)
 	content.add_child(btn_nuke)
 	
@@ -708,7 +739,7 @@ func render_cheats_tab() -> void:
 	
 	# Vitesse du jeu
 	var current_spd: float = GameEvents.gameplay_time_scale if (GameEvents != null and GameEvents.get("gameplay_time_scale") != null) else Engine.time_scale
-	add_label("Vitesse du jeu (Game Time Scale) : actuelle = %.2fx" % current_spd)
+	add_label(t("Game Speed (Time Scale): current = %.2fx", "Vitesse du jeu (Game Time Scale) : actuelle = %.2fx") % current_spd)
 	var speed_row = HBoxContainer.new()
 	add_quick_btn(speed_row, "x0.25", func(): set_game_speed(0.25))
 	add_quick_btn(speed_row, "x0.5", func(): set_game_speed(0.5))
@@ -722,10 +753,10 @@ func render_cheats_tab() -> void:
 	add_separator()
 	
 	# Contrôle des Vagues et Boss
-	add_label("Gestion des Vagues & Objectifs :")
+	add_label(t("Wave & Objective Controls:", "Gestion des Vagues & Objectifs :"))
 	var wave_row = HBoxContainer.new()
-	add_quick_btn(wave_row, "⏩ Finir Timer Vague", func(): finish_arena_timer())
-	add_quick_btn(wave_row, "📁 Spawn Safe Folder", func(): spawn_safe_folder())
+	add_quick_btn(wave_row, t("⏩ Finish Wave Timer", "⏩ Finir Timer Vague"), func(): finish_arena_timer())
+	add_quick_btn(wave_row, t("📁 Spawn Safe Folder", "📁 Spawn Safe Folder"), func(): spawn_safe_folder())
 	content.add_child(wave_row)
 	
 	var round_row = HBoxContainer.new()
@@ -733,7 +764,7 @@ func render_cheats_tab() -> void:
 		add_quick_btn(round_row, "Round %d" % r, func(): set_battle_round(r))
 	content.add_child(round_row)
 	
-	add_label("Invoquer un Boss :")
+	add_label(t("Spawn a Boss:", "Invoquer un Boss :"))
 	var boss_row = HBoxContainer.new()
 	add_quick_btn(boss_row, "Beach Ball", func(): spawn_boss("res://scenes/game_object/bosses/beachball_boss/beachball_boss.tscn"))
 	add_quick_btn(boss_row, "Recycle Bin", func(): spawn_boss("res://scenes/game_object/bosses/recycle_bin_boss/recycle_bin_boss.tscn"))
@@ -743,13 +774,13 @@ func render_cheats_tab() -> void:
 	add_separator()
 	
 	# Faire spawn des fichiers cliquables
-	add_label("Faire apparaitre un fichier :")
+	add_label(t("Spawn a File:", "Faire apparaitre un fichier :"))
 	var file_grid = GridContainer.new()
 	file_grid.columns = 3
 	for f in CLICKABLE_FILE_PATHS:
 		var btn_f = Button.new()
 		btn_f.text = f["name"]
-		btn_f.custom_minimum_size = Vector2(130, 20)
+		btn_f.custom_minimum_size = Vector2(135, 20)
 		btn_f.pressed.connect(func():
 			spawn_clickable_file(f["path"], f["name"])
 		)
@@ -765,7 +796,7 @@ func adjust_stat(stat_id: String, delta: float) -> void:
 	var current: float = StatsManager.stat_upgrades_flat.get(stat_id, 0.0)
 	StatsManager.stat_upgrades_flat[stat_id] = current + delta
 	StatsManager.update_stats()
-	set_status("Stat %s : %.2f" % [stat_id, StatsManager.final_stats.get(stat_id, 0.0)])
+	set_status(t("Stat %s : %.2f", "Stat %s : %.2f") % [stat_id, StatsManager.final_stats.get(stat_id, 0.0)])
 
 func reset_stat(stat_id: String) -> void:
 	if StatsManager == null:
@@ -774,7 +805,7 @@ func reset_stat(stat_id: String) -> void:
 	StatsManager.stat_upgrades_additive[stat_id] = 0.0
 	StatsManager.stat_upgrades_multiplicative[stat_id] = 1.0
 	StatsManager.update_stats()
-	set_status("Stat %s reinitialisee !" % stat_id)
+	set_status(t("Stat %s reset!", "Stat %s reinitialisee !") % stat_id)
 
 func buff_all_stats(factor: float) -> void:
 	if StatsManager == null:
@@ -824,9 +855,9 @@ func heal_player_full() -> void:
 		var missing: float = player.health_component.max_health - player.health_component.current_health
 		if missing > 0:
 			player.health_component.heal(int(missing))
-			set_status("Joueur soigne a 100% (+%d HP) !" % missing)
+			set_status(t("Player fully healed (+%d HP)!", "Joueur soigne a 100% (+%d HP) !") % missing)
 		else:
-			set_status("Joueur deja au maximum de points de vie.")
+			set_status(t("Player already at full health.", "Joueur deja au maximum de points de vie."))
 
 func modify_player_current_hp(delta: float) -> void:
 	var player = get_player()
@@ -841,42 +872,42 @@ func modify_player_current_hp(delta: float) -> void:
 func equip_weapon_by_id(weapon_id: String) -> void:
 	var um = get_upgrade_manager()
 	if um == null:
-		set_status("Action impossible : non en partie.")
+		set_status(t("Action unavailable: not in a run.", "Action impossible : non en partie."))
 		return
 	for w in um.all_weapons:
 		if w.id == weapon_id:
 			if w in um.current_weapons:
 				um.apply_silent_weapon_levels(w, 1)
-				set_status("%s monte au niveau superieur !" % w.name)
+				set_status(t("%s leveled up!", "%s monte au niveau superieur !") % w.name)
 			else:
 				um.apply_weapon(w)
-				set_status("%s equipe avec succes !" % w.name)
+				set_status(t("%s equipped successfully!", "%s equipe avec succes !") % w.name)
 			return
-	set_status("Arme introuvable : %s" % weapon_id)
+	set_status(t("Weapon not found: %s", "Arme introuvable : %s") % weapon_id)
 
 func level_up_run(levels: int) -> void:
 	var exp_mgr = get_experience_manager()
 	if exp_mgr == null:
-		set_status("Action impossible : non en partie.")
+		set_status(t("Action unavailable: not in a run.", "Action impossible : non en partie."))
 		return
 	if exp_mgr.has_method("grant_levels"):
 		exp_mgr.grant_levels(levels)
 	else:
 		exp_mgr.current_level += levels
 		exp_mgr.experience_updated.emit(exp_mgr.current_experience, exp_mgr.target_experience)
-	set_status("+%d niveaux accordes !" % levels)
+	set_status(t("+%d levels granted!", "+%d niveaux accordes !") % levels)
 	render_current_tab()
 
 func give_run_exp(amount: float) -> void:
 	var exp_mgr = get_experience_manager()
 	if exp_mgr == null:
-		set_status("Action impossible : non en partie.")
+		set_status(t("Action unavailable: not in a run.", "Action impossible : non en partie."))
 		return
 	if exp_mgr.has_method("increment_experience"):
 		exp_mgr.increment_experience(amount)
 	elif GameEvents != null and GameEvents.has_signal("experience_vial_collected"):
 		GameEvents.experience_vial_collected.emit(amount)
-	set_status("+%d EXP ajoutee !" % amount)
+	set_status(t("+%d EXP added!", "+%d EXP ajoutee !") % amount)
 	render_current_tab()
 
 func give_run_coins(amount: float) -> void:
@@ -889,7 +920,7 @@ func give_run_coins(amount: float) -> void:
 		cm.currency_collected.emit("Coin", new_val)
 	elif GameEvents != null and GameEvents.has_signal("currency_collected"):
 		GameEvents.currency_collected.emit("Coin", amount, true, false)
-	set_status("+%d pieces accordees !" % amount)
+	set_status(t("+%d coins granted!", "+%d pieces accordees !") % amount)
 	render_current_tab()
 
 func give_run_keys(amount: float) -> void:
@@ -902,7 +933,7 @@ func give_run_keys(amount: float) -> void:
 		cm.currency_collected.emit("Keys", new_val)
 	elif GameEvents != null and GameEvents.has_signal("currency_collected"):
 		GameEvents.currency_collected.emit("Keys", amount, true, false)
-	set_status("+%d cles accordees !" % amount)
+	set_status(t("+%d keys granted!", "+%d cles accordees !") % amount)
 	render_current_tab()
 
 func give_beanz(amount: int) -> void:
@@ -925,12 +956,12 @@ func give_beanz(amount: int) -> void:
 		cm.total_beanz_collected += amount
 		cm.currency_collected.emit("Beanz", run_new)
 	
-	set_status("+%d Beanz ajoutes au profil & run !" % amount)
+	set_status(t("+%d Beanz added to profile & run!", "+%d Beanz ajoutes au profil & run !") % amount)
 	render_current_tab()
 
 func unlock_all_content() -> void:
 	if UnlockManager == null or SaveManager == null:
-		set_status("Gestionnaire inaccessible.")
+		set_status(t("Manager unavailable.", "Gestionnaire inaccessible."))
 		return
 	UnlockManager.debug_unlock_all = true
 	var u = UnlockManager.unlocks()
@@ -944,7 +975,7 @@ func unlock_all_content() -> void:
 			UnlockManager.unlocked.emit(id_key)
 	SaveManager.save_profile()
 	UnlockManager.purchases_changed.emit("")
-	set_status("Tout le contenu (armes, objets, themes) a ete debloque !")
+	set_status(t("All content (weapons, items, themes) has been unlocked!", "Tout le contenu (armes, objets, themes) a ete debloque !"))
 	render_current_tab()
 
 func toggle_god_mode() -> void:
@@ -956,7 +987,7 @@ func toggle_god_mode() -> void:
 	if player != null and player.health_component != null:
 		if not cur:
 			player.health_component.current_health = player.health_component.max_health
-	set_status("God Mode = %s" % str(not cur))
+	set_status(t("God Mode = %s", "God Mode = %s") % str(not cur))
 
 func kill_all_enemies() -> void:
 	if GameEvents != null and GameEvents.main != null and GameEvents.main.enemy_manager != null:
@@ -977,7 +1008,7 @@ func kill_all_enemies() -> void:
 func finish_arena_timer() -> void:
 	if GameEvents != null and GameEvents.main != null and GameEvents.main.arena_time_manager != null:
 		GameEvents.main.arena_time_manager._on_timer_timeout()
-		set_status("Timer d'arene termine !")
+		set_status(t("Arena timer finished!", "Timer d'arene termine !"))
 		close()
 
 func spawn_safe_folder() -> void:
@@ -985,43 +1016,43 @@ func spawn_safe_folder() -> void:
 		var sf = load("res://scenes/game_object/clickables/safe_folder/safe_folder.tscn")
 		if sf != null:
 			GameEvents.main.round_manager.spawn_end_objective(sf, false)
-			set_status("Safe Folder apparu sur la carte !")
+			set_status(t("Safe Folder spawned on map!", "Safe Folder apparu sur la carte !"))
 			close()
 
 func set_battle_round(round_num: int) -> void:
 	if GameEvents != null and GameEvents.main != null and GameEvents.main.round_manager != null:
 		GameEvents.main.round_manager.current_battle_round = float(round_num)
-		set_status("Round regle a %d !" % round_num)
+		set_status(t("Round set to %d!", "Round regle a %d !") % round_num)
 
 func spawn_boss(path: String) -> void:
 	if GameEvents != null and GameEvents.main != null and GameEvents.main.round_manager != null:
 		var scene: PackedScene = load(path) as PackedScene
 		if scene != null:
 			GameEvents.main.round_manager.begin_boss_phase(scene)
-			set_status("Phase de Boss lancee !")
+			set_status(t("Boss phase started!", "Phase de Boss lancee !"))
 			close()
 
 func spawn_clickable_file(path: String, fname: String) -> void:
 	var icons_layer: Node2D = get_tree().get_first_node_in_group("icons_layer") as Node2D
 	var player = get_player()
 	if icons_layer == null or player == null:
-		set_status("Action impossible : non en partie.")
+		set_status(t("Action unavailable: not in a run.", "Action impossible : non en partie."))
 		return
 	var scene: PackedScene = load(path) as PackedScene
 	if scene == null:
-		set_status("Scene introuvable : %s" % path)
+		set_status(t("Scene not found: %s", "Scene introuvable : %s") % path)
 		return
 	var inst: Node2D = scene.instantiate() as Node2D
 	if inst != null:
 		inst.global_position = player.global_position + Vector2(randf_range(-70, 70), randf_range(-70, 70))
 		icons_layer.add_child(inst)
-		set_status("Fichier %s genere a proximite !" % fname)
+		set_status(t("File %s spawned nearby!", "Fichier %s genere a proximite !") % fname)
 
 func set_game_speed(scale_val: float) -> void:
 	Engine.time_scale = scale_val
 	if GameEvents != null:
 		GameEvents.gameplay_time_scale = scale_val
-	set_status("Vitesse jeu = %.2fx" % scale_val)
+	set_status(t("Game Speed = %.2fx", "Vitesse jeu = %.2fx") % scale_val)
 	render_current_tab()
 
 # ==============================================================================

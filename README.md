@@ -8,6 +8,8 @@ Un menu de débogage et trainer complet, parfaitement intégré au style visuel 
 
 Ce mod fonctionne aussi bien sur **Windows** que sur **Linux / Steam Deck (SteamOS)**, sans aucune dépendance externe requise pour l'installation !
 
+🌐 **Bilingue Anglais / Français (Bilingual English & French)** : Le menu s'adapte automatiquement à la langue de votre jeu et dispose d'un bouton de bascule instantanée en un clic ([🌐 EN] / [🌐 FR]) directement dans la barre d'en-tête.
+
 ---
 
 ## 🎮 Fonctionnalités du Menu Debug
